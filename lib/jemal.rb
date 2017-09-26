@@ -80,17 +80,7 @@ module Jemal
   # Returns a Set with integer arena indices. Every index is in
   # [0, arenas_count-1] range.
   def self.initialized_arenas
-    n = arenas_count
-    ptr = FFI::MemoryPointer.new :bool
-
-    (0...n).inject(Set.new) do |indices, i|
-      mallctl "arena.#{i}.initialized", ptr, size_pointer(ptr), nil, 0
-      if ptr.get_uchar(0) > 0
-        indices << i
-      else
-        indices
-      end
-    end
+    (0..(arenas_count - 1)).to_a
   end
 
   # Public: Get various sizes.
@@ -200,7 +190,7 @@ module Jemal
     (0...bin_sizes.size).each do |i|
       binprefix = "#{prefix}bins.#{i}."
       nruns = get_uint64("#{binprefix}nslabs")
-      next if nruns == 0
+      #next if nruns == 0
 
       bins[bin_sizes[i][:size]] = {
         # Current number of bytes allocated by bin.
